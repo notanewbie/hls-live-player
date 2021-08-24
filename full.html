@@ -18,7 +18,7 @@ body {
 background-color: black;
 }
 </style>
-<script src="https://cdn.jsdelivr.net/hls.js/latest/hls.min.js"></script>
+<script src="hls.min.js"></script>
 <html>
 <body>
 <img id="image" src="http://notanewbie.com/media/static.jpg" />
@@ -117,11 +117,16 @@ function toggler()
       if(QUERIES[x].indexOf("volume=") > -1) {
           video.volume = QUERIES[x].split("=")[1] / 10
       }
+	 if(QUERIES[x].indexOf("auto=") > -1 && QUERIES[x].split("=")[1] == 1) {
+           video.muted = true;
+		video.play();
+		video.muted = false;
+      }
       x = x + 1
   }
   }
   catch(e) {
-  video.src = "http://notanewbie.com/media/TV%20no%20signal%20effect%20%231.mp4"
+  video.src = "https://ia801904.us.archive.org/27/items/GT604/Input.Crash.mp4?cnt=0"
   video.play()
   }
  // var videoSrcInHls = location.search.split("?")[1];

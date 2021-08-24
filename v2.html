@@ -1,0 +1,366 @@
+<style type="text/css">
+@media only screen and (max-width: 600px) {
+input {
+position: fixed;
+top: 10000000000000000vh;
+left: 10000000000000000000vw;
+}
+}
+#video {
+position: fixed;
+left: 0px;
+top: 0px;
+height: 100vh;
+width: 100vw;
+z-index: 2;
+}
+#fancy {
+position: fixed;
+z-index: 5;
+bottom: 0px;
+left: 0px;
+width: 100%;
+height: 40px;
+background-color: #0f0f0f;
+opacity: 0.8;
+}
+@keyframes fadein {
+0% {
+opacity: 0;
+}
+10% {
+opacity: 0.8;
+}
+100% {
+opacity: 0.8;
+}
+}
+
+@keyframes fadeout {
+0% {
+opacity: 0.8;
+}
+80% {
+opacity: 0.8;
+}
+100% {
+opacity: 0;
+}
+}
+#anim {
+position: fixed;
+z-index: 5;
+bottom: 0px;
+left: 0px;
+width: 100%;
+height: 40px;
+background-color: #0f0f0f;
+opacity: 0;
+animation-name: fadeout;
+animation-duration: 5s;
+}
+con {
+position: fixed;
+z-index: 5;
+color: white;
+font-size: 15;
+font-family: Arial;
+}
+#hidden {
+position: fixed;
+bottom: 5000vh;
+left: 50000vw;
+}
+body {
+background-color: black;
+}
+img {
+width: 20px;
+margin-left: 5px;
+margin-right: 5px;
+}
+left {
+margin-left: 30px;
+}
+text {
+position: relative;
+top: 5px;
+margin-left: 5px;
+margin-right: 5px;
+
+}
+pic {
+position: relative;
+top: 10px;
+}
+pic2 {
+position: relative;
+top: 10px;
+}
+input {
+position: relative;
+top: 10px;
+margin-left: 5px;
+margin-right: 5px;
+width: 20vw;
+}
+
+
+right {
+position: fixed;
+right: 0px;
+}
+a:link {
+color: white;
+text-decoration: none;
+}
+</style>
+<script src="http://streambox.fr/mse/hls.js-0.8.4/dist/hls.js"></script>
+<html>
+<body>
+<content>
+<video id="video" controls loop autoplay></video>
+<con id="hidden">
+<left>
+<pic>
+<a href="javascript:rw()"> <img src="https://png.icons8.com/ios/150/ffffff/replay-30.png"></img></a> 
+<a href="javascript:playPause()"><img src="https://png.icons8.com/material/96/ffffff/pause.png" onclick="javascript:this.src = evalPlay()"></img></a> 
+<a href="javascript:ff()"><img src="https://png.icons8.com/ios/150/ffffff/forward-30.png"></img></a>
+</pic>
+<text>Live </text>
+</left>
+<right>
+<input type="range" min="0" max="10" onchange="changeVid()"> 
+<text>
+<a href="javascript:PiP()"> PiP</img></a>
+</text>
+<pic2>
+<a href="javascript:toggleFull()"><img src="http://www.iconhot.com/icon/png/default-icon/258/full-screen-inv.png"></img></a> 
+</pic2>
+</right></con>
+</content>
+</body>
+</html>
+<script type="text/javascript">
+content = document.getElementsByTagName("content")[0];
+controls = document.getElementsByTagName("con")[0];
+slider = document.getElementsByTagName("input")[0];
+CHECKING = false;
+THROTTLE_LEVEL = -1;
+THROTTLE = true;
+FULLSCREEN = false;
+RUN = false;
+PAUSED = false;
+function changeVid() {
+    video.volume = slider.value / 10;
+}
+function showControls() {
+controls.id = "fancy"
+controls.style.animationName = "fadein"
+controls.style.webkitAnimationName = "fadein"
+controls.style.webkitAnimationDuration = "4s";
+controls.style.opacity = 0.8;
+}
+function evalPlay() {
+if(video.paused) {
+return "https://png.icons8.com/material/96/ffffff/pause.png"
+}
+else {
+return "https://png.icons8.com/material/96/ffffff/play.png"
+}
+}
+function hideControls() {
+controls.style.animationName = "fadeout"
+controls.style.webkitAnimationName = "fadeout"
+controls.style.webkitAnimationDuration = "4s";
+controls.style.opacity = 0;
+CHECKING = false;
+}
+function hideControls() {
+controls.id = "fancy"
+//controls.id = "anim"
+setTimeout(function() { controls.id="anim"; }, 20)
+}
+function getDiff(a, b) {
+return Math.abs(a - b);
+}
+function sortNumber(a,b) {
+    return b.diff - a.diff;
+}
+function getClosestQuality() {
+    LEVELS = hls.levels;
+    hls = new Hls();
+    z = 0;
+    while(z < LEVELS.length) {
+        LEVELS[z].diff = getDiff(LEVELS[z].height, THROTTLE_LEVEL)
+        LEVELS[z].i = z
+        z = z + 1
+      }
+    LEVELS.sort(sortNumber)
+    //alert(LEVELS[0].i)
+    return LEVELS[0]
+}
+function toggleFull() {
+if(FULLSCREEN == false) {
+var requestMethod = content.requestFullScreen || content.webkitRequestFullScreen || content.mozRequestFullScreen || content.msRequestFullScreen;
+
+    if (requestMethod) { // Native full screen.
+        requestMethod.call(content);
+    } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+        var wscript = new ActiveXObject("WScript.Shell");
+        if (wscript !== null) {
+            wscript.SendKeys("{F11}");
+        }
+    }
+FULLSCREEN = true;
+}
+else {
+if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+FULLSCREEN = false;
+}
+}
+function postTime() {
+    console.log("==")
+    console.log(hls.currentLevel)
+    console.log(hls.nextLevel)
+    console.log(hls.nextLoadLevel)
+    hls.currentLevel = LEVELS[0].i
+    hls.nextLevel = LEVELS[0].i
+    hls.nextLoadLevel = LEVELS[0].i
+    console.log("CHANGED")
+    console.log("currentLevel: " + hls.currentLevel)
+    console.log("nextLevel: " + hls.nextLevel)
+    console.log("currentLoadLevel: " + hls.nextLoadLevel)
+    console.log("LEVELS URL: " + LEVELS[0].url)
+    console.log("LEVELS i: " + LEVELS[0].i)
+}
+function toggler()
+{
+    controls = document.getElementsByTagName("con")[0];
+    //alert(controls.innerHTML)
+    video.play();
+    e = getClosestQuality()
+    console.log("I ran.")
+    if(RUN == false) {
+    LEVELS = hls.levels;
+    hls = new Hls();
+    //hls.startLevel = 0;
+    if(THROTTLE_LEVEL > -1) {
+    hls.firstLevel = 0;
+    z = 0;
+    while(LEVELS[z]) {
+        //alert(LEVELS[z].height)
+        LEVELS[z].diff = getDiff(LEVELS[z].height, THROTTLE_LEVEL)
+        LEVELS[z].i = z
+        z = z + 1
+      }
+    LEVELS.sort(sortNumber)
+    hls.currentLevel = LEVELS[0].i + 1
+    hls.nextLevel = LEVELS[0].i + 1
+    hls.nextLoadLevel = LEVELS[0].i + 1
+    }
+    //alert(LEVELS[0].url)
+    postTime()
+    setInterval(postTime, 10000)
+    //alert(LEVELS[0].url)
+    //alert(LEVELS[0].i)
+    RUN = true
+    hls.startLoad()
+    }
+    video.play();
+    }
+  var video = document.getElementsByTagName("video")[0];
+  //video.src = "http://notanewbie.com/media/TV%20no%20signal%20effect%20%231.mp4"
+  var videoSrcInHls = "https://nmxlive.akamaized.net/hls/live/529965/Live_1/index.m3u8";
+  SEARCH = location.search.split("?")[1]
+  //try {
+  QUERIES = SEARCH.split("&")
+  //alert(QUERIES)
+  x = 0
+  while(x < QUERIES.length) {
+      //alert(QUERIES[x])
+      //alert(QUERIES[x].indexOf("fancy="))
+      if(QUERIES[x].indexOf("url=") > -1) {
+          videoSrcInHls = QUERIES[x].split("=")[1]
+      }
+      if(QUERIES[x].indexOf("quality=") > -1) {
+          THROTTLE_LEVEL = QUERIES[x].split("=")[1]
+      }
+      if(QUERIES[x].indexOf("volume=") > -1) {
+          video.volume = QUERIES[x].split("=")[1] / 10
+          slider.value = video.volume * 10
+      }
+	if(QUERIES[x].indexOf("fancy=") > -1) {
+          FANCY = QUERIES[x].split("=")[1]
+          document.addEventListener("mouseover", hideControls);
+      }
+      //alert(x < QUERIES.length)
+      x = x + 1
+      //alert(x < QUERIES.length)
+  }
+  //}
+  //catch(e) {
+  //video.src = "http://notanewbie.com/media/TV%20no%20signal%20effect%20%231.mp4"
+  video.play()
+  //}
+ // var videoSrcInHls = location.search.split("?")[1];
+try {
+if(FANCY == "yes") {
+		video.controls = false;
+		controls.id = "fancy";
+                hideControls()
+	}
+}
+catch(e) {
+video.controls = true;
+}
+  var videoSrcInMp4 = "https://www.jenrenalcare.com/upload/poanchen.github.io/sample-code/2016/11/17/how-to-play-mp4-video-using-hls/sample.mp4";
+  if(navigator.userAgent.indexOf("obile") == -1 && navigator.userAgent.indexOf("Android") == -1) {
+    var hls = new Hls();
+
+    hls.loadSource(videoSrcInHls);
+    hls.autoLevelEnabled = false;
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED,toggler);
+
+  }
+ if(navigator.userAgent.indexOf("obile") > -1 || navigator.userAgent.indexOf("ndroid") > -1){
+    video.src = videoSrcInHls;
+    video.play();
+  }
+  function addSourceToVideo(element, src, type) {
+    var source = document.createElement('source');
+    source.src = src;
+    source.type = type;
+    element.appendChild(source);
+  }
+function PiP() {
+video.webkitSetPresentationMode(video.webkitPresentationMode === "picture-in-picture" ? "inline" : "picture-in-picture");
+video.requestPictureInPicture()
+
+}
+function ff() {
+video.currentTime = video.currentTime + 30
+}
+function rw() {
+video.currentTime = video.currentTime - 30
+}
+function playPause() {
+if(PAUSED == false) {
+    video.pause()
+    PAUSED = true
+}
+else {
+    video.play()
+    PAUSED = false
+}
+}
+</script>
